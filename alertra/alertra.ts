@@ -1,8 +1,24 @@
 import fetch from 'node-fetch';
 
 type DeviceRecord = {
-   id: string;
+   device_id: string;
    ShortName: string;
+};
+
+type CheckRecord = {
+   Location: string;
+   Timestamp: string;
+   ResultCode: number;
+   PerfStat: string;
+   RequestTime: number;
+   DataSize: number;
+   DNSTime: number;
+   ConnectTime: number;
+   SSLTime: number;
+   TTFB: number;
+   TTLB: number;
+   Kbps: number;
+   CheckResult: string;
 };
 
 export class Alertra {
@@ -19,7 +35,15 @@ export class Alertra {
    }
 
    devices(maxRecords: number) {
-      return this.paginate<DeviceRecord>("https://api.alertra.com/v1.1/devices", maxRecords);
+      return this.paginate<DeviceRecord>(
+         "https://api.alertra.com/v1.1/devices",
+         maxRecords);
+   }
+
+   checks(deviceId: string, maxRecords: number) {
+      return this.paginate<CheckRecord>(
+         `https://api.alertra.com/v1.1/devices/${deviceId}/checks`,
+         maxRecords);
    }
 
    async paginate<ResponseRecord>(url: string, maxRecords: number) {
