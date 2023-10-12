@@ -2,7 +2,8 @@
   "name": "alertra-prometheus-exporter",
   "version": "1.0.0",
   "description": "Prometheus Exporter for alertra.com uptime monitor",
-  "main": "index.js",
+  "main": "dist/app.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "tsc && node dist/app.js"
