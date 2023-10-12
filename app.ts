@@ -1,4 +1,5 @@
 import express from 'express';
+import { Alertra } from './alertra';
 
 const app = express();
 const port = 3000;
