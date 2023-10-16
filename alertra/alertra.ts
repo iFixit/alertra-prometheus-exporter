@@ -1,11 +1,11 @@
 import fetch from 'node-fetch';
 
-type DeviceRecord = {
+export type DeviceRecord = {
    device_id: string;
    ShortName: string;
 };
 
-type CheckRecord = {
+export type CheckRecord = {
    Location: string;
    Timestamp: string;
    ResultCode: number;
@@ -49,7 +49,7 @@ export class Alertra {
    async paginate<ResponseRecord>(url: string, maxRecords: number) {
       var results: ResponseRecord[] = [];
       let page = 0;
-      const pageSize = 50;
+      const pageSize = Math.min(50, maxRecords);
       const getPaginatedUrl = urlPaginator(url, pageSize);
       while (true) {
          const response = await fetch(getPaginatedUrl(page), this.#fetchOptions);
