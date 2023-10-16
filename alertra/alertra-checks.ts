@@ -13,30 +13,15 @@ export function getAllDevicesAndChecks(alertra: Alertra) {
    });
 }
 
-function debounce<T>(fn: () => T, delay: number): () => T {
-   let lastCall = 0;
-   let value: T|null = null;
-   return (() => {
-      if (Date.now() > lastCall + delay || value === null) {
-         value = fn();
-         lastCall = Date.now();
-      }
-      return value;
-   });
-}
-
-export function cachedGetChecksByDeviceAndLocation(alertra: Alertra, refetchSeconds: number) {
-   function fetchDevices() {
-      return getAllDevicesAndChecks(alertra).then(devices =>
-         devices.map(device => (
-            {
-               ShortName: device.ShortName,
-               checksByLocation: mostRecentCheckPerLocation(device.checks),
-            }
-         ))
-      )
-   }
-   return debounce(fetchDevices, refetchSeconds * 1000);
+export function getChecksByDeviceAndLocation(alertra: Alertra, refetchSeconds: number) {
+   return getAllDevicesAndChecks(alertra).then(devices =>
+      devices.map(device => (
+         {
+            ShortName: device.ShortName,
+            checksByLocation: mostRecentCheckPerLocation(device.checks),
+         }
+      ))
+   );
 }
 
 function mostRecentCheckPerLocation(checks: CheckRecord[]) {

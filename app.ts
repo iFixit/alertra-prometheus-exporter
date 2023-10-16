@@ -1,22 +1,10 @@
-import express from 'express';
 import { Alertra, CheckRecord } from './alertra/alertra.js';
-import { cachedGetChecksByDeviceAndLocation, getAllDevicesAndChecks } from './alertra/alertra-checks.js';
-
-const app = express();
-const port = 3000;
-
-app.get('/', (req, res) => {
-  res.send('Hello, Express with TypeScript!');
-});
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+import { getChecksByDeviceAndLocation } from './alertra/alertra-checks.js';
 
 const alertra = new Alertra(String(process.env.ALERTRA_API_KEY));
-const getChecksByDevice = cachedGetChecksByDeviceAndLocation(alertra, 60);
+const checksByDevice = getChecksByDeviceAndLocation(alertra, 61);
 
-getChecksByDevice().then(devices => {
+checksByDevice.then(devices => {
   devices.forEach(device => {
     device.checksByLocation.forEach((check, location) => {
       const labels = [
@@ -47,7 +35,6 @@ getChecksByDevice().then(devices => {
       console.log(output.join("\n"));
     });
   });
-  process.exit();
 });
 
 function label(key: string, value: string) {
