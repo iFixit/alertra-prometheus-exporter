@@ -1,9 +1,12 @@
 import { Alertra, CheckRecord } from "./alertra";
 
+const devicesToFetch = 1;
+const checksToFetch = 30;
+
 export function getAllDevicesAndChecks(alertra: Alertra) {
-   return alertra.devices(1).then(devices => {
+   return alertra.devices(devicesToFetch).then(devices => {
       return Promise.all(devices.map(device => {
-         return alertra.checks(device.device_id, 30).then(checks => {
+         return alertra.checks(device.device_id, checksToFetch).then(checks => {
             return {...device, checks};
          });
       }));
