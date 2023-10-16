@@ -1,6 +1,6 @@
 import express from 'express';
 import { Alertra, CheckRecord } from './alertra/alertra.js';
-import { cachedGetAllDevices, getAllDevicesAndChecks } from './alertra/alertra-checks.js';
+import { cachedGetChecksByDeviceAndLocation, getAllDevicesAndChecks } from './alertra/alertra-checks.js';
 
 const app = express();
 const port = 3000;
@@ -13,22 +13,11 @@ app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
-const a = new Alertra(String(process.env.ALERTRA_API_KEY));
-const getDevices = cachedGetAllDevices(a, 60);
+const alertra = new Alertra(String(process.env.ALERTRA_API_KEY));
+const getChecksByDevice = cachedGetChecksByDeviceAndLocation(alertra, 60);
 
-getDevices().then(devices => {
-  devices.map(device => {
-    const checksByLocation = new Map<string, CheckRecord>();
-    device.checks.forEach(check => {
-      if (!checksByLocation.has(check.Location)) {
-        checksByLocation.set(check.Location, check);
-      }
-    });
-    return {
-      ShortName: device.ShortName,
-      checksByLocation,
-    };
-  }).forEach(device => {
+getChecksByDevice().then(devices => {
+  devices.forEach(device => {
     device.checksByLocation.forEach((check, location) => {
       const labels = [
         label("device", device.ShortName),
