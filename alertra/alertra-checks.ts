@@ -26,10 +26,15 @@ export function getChecksByDeviceAndLocation(alertra: Alertra) {
 
 function mostRecentCheckPerLocation(checks: CheckRecord[]) {
    const checksByLocation = new Map<string, CheckRecord>();
+   checks.sort((a, b) => compDesc(a.Timestamp, b.Timestamp));
    checks.forEach(check => {
       if (!checksByLocation.has(check.Location)) {
          checksByLocation.set(check.Location, check);
       }
    });
    return checksByLocation;
+}
+
+function compDesc(a: string, b: string): number {
+   return a === b ? 0 : (a > b ? -1 : 1);
 }
