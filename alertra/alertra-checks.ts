@@ -13,7 +13,7 @@ export function getAllDevicesAndChecks(alertra: Alertra) {
    });
 }
 
-export function getChecksByDeviceAndLocation(alertra: Alertra, refetchSeconds: number) {
+export function getChecksByDeviceAndLocation(alertra: Alertra) {
    return getAllDevicesAndChecks(alertra).then(devices =>
       devices.map(device => (
          {

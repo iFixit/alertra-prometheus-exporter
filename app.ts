@@ -2,7 +2,7 @@ import { Alertra, CheckRecord } from './alertra/alertra.js';
 import { getChecksByDeviceAndLocation } from './alertra/alertra-checks.js';
 
 const alertra = new Alertra(String(process.env.ALERTRA_API_KEY));
-const checksByDevice = getChecksByDeviceAndLocation(alertra, 61);
+const checksByDevice = getChecksByDeviceAndLocation(alertra);
 
 checksByDevice.then(devices => {
   devices.forEach(device => {
