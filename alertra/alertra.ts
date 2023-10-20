@@ -53,6 +53,10 @@ export class Alertra {
       const getPaginatedUrl = urlPaginator(url, pageSize);
       while (true) {
          const response = await fetch(getPaginatedUrl(page), this.#fetchOptions);
+         if (!response.ok) {
+            const text = await response.text();
+            throw new Error("API Request failed. Status:" + response.status + " body:" + text);
+         }
          const resultPage = await response.json() as ResponseRecord[];
          results = results.concat(resultPage.slice(0, pageSize));
          if (resultPage.length <= pageSize || results.length >= maxRecords) {
