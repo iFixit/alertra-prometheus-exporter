@@ -1,6 +1,6 @@
 import { Alertra, CheckRecord } from "./alertra";
 
-const devicesToFetch = 1;
+const devicesToFetch = 30;
 const checksToFetch = 30;
 
 export function getAllDevicesAndChecks(alertra: Alertra) {
