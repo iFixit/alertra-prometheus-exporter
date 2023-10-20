@@ -5,6 +5,14 @@ const alertra = new Alertra(String(process.env.ALERTRA_API_KEY));
 const checksByDevice = getChecksByDeviceAndLocation(alertra);
 
 checksByDevice.then(devices => {
+  console.log([
+    help('alertra_check_time', "Time in seconds of segements of the request"),
+    type("alertra_check_time", "gauge"),
+    help('alertra_check_total_time', "Time in seconds of the whole request"),
+    type("alertra_check_total_time", "gauge"),
+    help('alertra_check_response_bytes', "Number of bytes in the response"),
+    type("alertra_check_response_bytes", "gauge"),
+  ].join("\n"));
   devices.forEach(device => {
     device.checksByLocation.forEach((check, location) => {
       const labels = [
@@ -12,8 +20,6 @@ checksByDevice.then(devices => {
         label("location", location)
       ];
       const output = [
-        help('alertra_check_time', "Time in seconds of segements of the request"),
-        type("alertra_check_time", "gauge"),
         ...metric('alertra_check_time',
           [
             [[...labels, label('component', 'DNS')], msToS(check.DNSTime)],
@@ -24,12 +30,7 @@ checksByDevice.then(devices => {
           ]
         ),
 
-        help('alertra_check_total_time', "Time in seconds of the whole request"),
-        type("alertra_check_total_time", "gauge"),
         ...metric('alertra_check_total_time', [[labels, msToS(check.RequestTime)]]),
-
-        help('alertra_check_response_bytes', "Number of bytes in the response"),
-        type("alertra_check_response_bytes", "gauge"),
         ...metric('alertra_check_response_bytes', [[labels, check.DataSize]]),
       ];
       console.log(output.join("\n"));
