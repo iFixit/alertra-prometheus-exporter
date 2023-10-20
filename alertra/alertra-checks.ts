@@ -2,12 +2,14 @@ import { Alertra, CheckRecord } from "./alertra";
 
 const devicesToFetch = 30;
 const checksToFetch = 30;
+const ignoreChecksOlderThanMs = 3600 * 1000;
 
 export function getAllDevicesAndChecks(alertra: Alertra) {
    return alertra.devices(devicesToFetch).then(devices => {
       return Promise.all(devices.map(device => {
          return alertra.checks(device.device_id, checksToFetch).then(checks => {
-            return {...device, checks};
+            const recentChecks = checks.filter(isCheckRecent);
+            return {...device, checks: recentChecks};
          });
       }));
    });
@@ -33,6 +35,11 @@ function mostRecentCheckPerLocation(checks: CheckRecord[]) {
       }
    });
    return checksByLocation;
+}
+
+function isCheckRecent(check: CheckRecord): boolean {
+   const checkDate = new Date(check.Timestamp);
+   return (Date.now() - checkDate.getTime()) < ignoreChecksOlderThanMs;
 }
 
 function compDesc(a: string, b: string): number {
