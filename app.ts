@@ -1,25 +1,29 @@
 import { Alertra, CheckRecord } from './alertra/alertra.js';
-import { getChecksByDeviceAndLocation } from './alertra/alertra-checks.js';
+import { ChecksByDeviceAndLocation, getChecksByDeviceAndLocationLoader } from './alertra/alertra-checks.js';
+import * as http from "http";
+
+const httpPort = Number(process.env.PORT) || 13964;
+const cacheTTL = 10 * 60;
 
 const alertra = new Alertra(String(process.env.ALERTRA_API_KEY));
-const checksByDevice = getChecksByDeviceAndLocation(alertra);
+const getChecksByDevice = getChecksByDeviceAndLocationLoader(alertra, cacheTTL);
 
-checksByDevice.then(devices => {
-  console.log([
+function writeMetrics(res: http.ServerResponse, devices: ChecksByDeviceAndLocation) {
+  const output = [
     help('alertra_check_time', "Time in seconds of segements of the request"),
     type("alertra_check_time", "gauge"),
     help('alertra_check_total_time', "Time in seconds of the whole request"),
     type("alertra_check_total_time", "gauge"),
     help('alertra_check_response_bytes', "Number of bytes in the response"),
     type("alertra_check_response_bytes", "gauge"),
-  ].join("\n"));
+  ];
   devices.forEach(device => {
     device.checksByLocation.forEach((check, location) => {
       const labels = [
         label("device", device.ShortName),
         label("location", location)
       ];
-      const output = [
+      output.push(
         ...metric('alertra_check_time',
           [
             [[...labels, label('component', 'DNS')], msToS(check.DNSTime)],
@@ -31,12 +35,12 @@ checksByDevice.then(devices => {
         ),
 
         ...metric('alertra_check_total_time', [[labels, msToS(check.RequestTime)]]),
-        ...metric('alertra_check_response_bytes', [[labels, check.DataSize]]),
-      ];
-      console.log(output.join("\n"));
+        ...metric('alertra_check_response_bytes', [[labels, check.DataSize]])
+      );
     });
   });
-});
+  res.write(output.join("\n"));
+}
 
 function label(key: string, value: string) {
   return `${key}="${value}"`;
@@ -59,3 +63,19 @@ function type(name: string, type: string) {
 function msToS(ms: number) {
   return ms / 1000;
 }
+
+http.createServer(async (req, res) => {
+  try {
+    const devices = await getChecksByDevice();
+    writeMetrics(res, devices);
+  } catch (e) {
+    console.error(e);
+    res.statusCode = 500;
+    if (e instanceof Error) {
+      res.write("# " + e.message);
+    }
+  }
+  res.end();
+}).listen(httpPort);
+
+console.log("Listening for requests on port " + httpPort);

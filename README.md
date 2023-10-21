@@ -21,17 +21,15 @@ Specifically, this exposes three gauge metrics:
     HELP alertra_check_response_bytes Number of bytes in the response
     TYPE alertra_check_response_bytes gauge
 
+### Config
+
+* env: `ALERTRA_API_KEY`
+* env: `PORT` tcp port on which to listen for http requests
+
 ### Usage
 
-Set the `ALERTRA_API_KEY` env variable and run `npm run start` (in dev mode) or
-`node dist/app.js` if it's already been built to print the prometheus metics.
-The metrics are delievered on stdout, debug, progress, or error messages are
-written to stderr.
+* `npm run start`
+* OR `npm run build` then `node dist/app.js`
 
-To use it in production, set up a cron job like so:
-
-    */10 * * * * cd /path/to/app && node ./dist/app.ts > metrics.list
-
-The configure something like a [prometheus file exporter](https://github.com/weibeld/file-exporter)
-to serve that to prometheus.
-
+If errors are encoutered they are printed on stderr and the client will
+receieve a 500.

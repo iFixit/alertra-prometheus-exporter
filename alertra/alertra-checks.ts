@@ -1,10 +1,27 @@
+import { type } from "os";
 import { Alertra, CheckRecord } from "./alertra";
 
 const devicesToFetch = 30;
 const checksToFetch = 30;
 const ignoreChecksOlderThanMs = 3600 * 1000;
 
-export function getAllDevicesAndChecks(alertra: Alertra) {
+export type ChecksByDeviceAndLocation = Awaited<ReturnType<typeof getChecksByDeviceAndLocation>>;
+
+export function getChecksByDeviceAndLocationLoader(alertra: Alertra, cacheTTL: number) {
+   let lastFetch = 0;
+   let checks: null|Promise<ChecksByDeviceAndLocation> = null;
+   const cacheTTLms = cacheTTL * 1000;
+   return (): Promise<ChecksByDeviceAndLocation> => {
+      if (!checks || (Date.now() - lastFetch) > cacheTTLms) {
+         lastFetch = Date.now();
+         checks = getChecksByDeviceAndLocation(alertra);
+         checks.then(() => console.log("Devices and Checks fetched from Alertra in " + (Date.now() - lastFetch) / 1000 + "s"));
+      }
+      return checks;
+   };
+}
+
+function getAllDevicesAndChecks(alertra: Alertra) {
    return alertra.devices(devicesToFetch).then(devices => {
       return Promise.all(devices.map(device => {
          return alertra.checks(device.device_id, checksToFetch).then(checks => {
@@ -15,7 +32,7 @@ export function getAllDevicesAndChecks(alertra: Alertra) {
    });
 }
 
-export function getChecksByDeviceAndLocation(alertra: Alertra) {
+function getChecksByDeviceAndLocation(alertra: Alertra) {
    return getAllDevicesAndChecks(alertra).then(devices =>
       devices.map(device => (
          {
