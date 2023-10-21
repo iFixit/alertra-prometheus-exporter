@@ -3,7 +3,7 @@ import { ChecksByDeviceAndLocation, getChecksByDeviceAndLocationLoader } from '.
 import * as http from "http";
 
 const httpPort = Number(process.env.PORT) || 13964;
-const cacheTTL = 10 * 60;
+const cacheTTL = Number(process.env.METRIC_CACHE_TTL) || 10 * 60;
 
 const alertra = new Alertra(String(process.env.ALERTRA_API_KEY));
 const getChecksByDevice = getChecksByDeviceAndLocationLoader(alertra, cacheTTL);

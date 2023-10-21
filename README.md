@@ -24,7 +24,10 @@ Specifically, this exposes three gauge metrics:
 ### Config
 
 * env: `ALERTRA_API_KEY`
-* env: `PORT` tcp port on which to listen for http requests
+* env: `PORT` (default 13964) tcp port on which to listen for http requests
+* env: `METRIC_CACHE_TTL` (default 600) Cache lifetime for alertra data
+    * After this many seconds have passed since the data was fetch, it'll be fetched again on the next request
+
 
 ### Usage
 
