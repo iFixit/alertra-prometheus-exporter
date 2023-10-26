@@ -1,5 +1,5 @@
-import { Alertra, CheckRecord } from './alertra/alertra.js';
-import { ChecksByDeviceAndLocation, getChecksByDeviceAndLocationLoader } from './alertra/alertra-checks.js';
+import { Alertra, CheckRecord } from './lib/alertra/alertra.js';
+import { ChecksByDeviceAndLocation, getChecksByDeviceAndLocationLoader } from './lib/alertra/alertra-checks.js';
 import * as http from "http";
 
 const httpPort = Number(process.env.PORT) || 13964;
