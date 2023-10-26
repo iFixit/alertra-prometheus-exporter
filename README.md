@@ -3,9 +3,9 @@
 [Alertra](https://alertra.com) repeatedly pings urls from around the globe and records stats about the
 responses (timing, bytes, location, ...). This tool uses alertra's API to pull
 down check data for all devices (urls its configured to ping) and expose that
-as prometheus metrics.
+as prometheus and graphite metrics.
 
-Specifically, this exposes three gauge metrics:
+Specifically, this exposes three prometheus gauge metrics:
    
     # Reported once per device and location and component (DNS, TTFB, ...) such that
     #    sum by (device, location)(alertra_check_time) of these should match the
@@ -21,13 +21,22 @@ Specifically, this exposes three gauge metrics:
     HELP alertra_check_response_bytes Number of bytes in the response
     TYPE alertra_check_response_bytes gauge
 
+The same information is reported to graphite if configured as three gauge metrics:
+
+    alertra.check_time
+    alertra.check_total_time
+    alertra.check_response_bytes
+
 ### Config
 
 * env: `ALERTRA_API_KEY`
 * env: `PORT` (default 13964) tcp port on which to listen for http requests
 * env: `METRIC_CACHE_TTL` (default 600) Cache lifetime for alertra data
     * After this many seconds have passed since the data was fetch, it'll be fetched again on the next request
-
+* env: `GRAPHITE_HOST` (default null) hostname of graphite server
+    * If not null, this server will also report these stats to graphite
+* env: `GRAPHITE_PORT` (default 2003) port number of graphite server
+* env: `GRAPHITE_INTERVAL_S` (default 10s) How often in seconds to report these metrics to graphite
 
 ### Usage
 
