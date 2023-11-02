@@ -26,3 +26,6 @@ http.createServer(async (req, res) => {
 }).listen(httpPort);
 
 console.log("Listening for requests on port " + httpPort);
+
+process.on('SIGINT', process.exit);
+process.on('SIGTERM', process.exit);

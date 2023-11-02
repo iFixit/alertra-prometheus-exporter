@@ -17,4 +17,4 @@ RUN npm ci --omit=dev && npm cache clean --force && find -name "*.ts" -delete
 RUN tree ./
 ENV PORT=13964
 EXPOSE 13964
-CMD ["node", "app.js"]
+ENTRYPOINT ["node", "app.js"]
