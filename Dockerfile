@@ -1,20 +1,11 @@
-FROM node:18-alpine as build
-
-RUN mkdir -p /opt/alertra-promtheus-exporter
-WORKDIR /src
-
-COPY package*.json tsconfig.json app.ts ./
-COPY lib lib/
-RUN tree ./
-RUN npm install --unsafe-perm
-RUN npm exec tsc
-
 FROM node:18-alpine
+RUN mkdir -p /opt/alertra-promtheus-exporter
 WORKDIR /opt/alertra-prometheus-exporter
-COPY --from=build /src/package*.json /src/dist ./
-RUN tree ./
-RUN npm ci --omit=dev && npm cache clean --force && find -name "*.ts" -delete
-RUN tree ./
+
+COPY package*.json ./
+RUN npm ci && npm cache clean --force
+COPY . ./
+RUN npm exec tsc
 ENV PORT=13964
 EXPOSE 13964
-ENTRYPOINT ["node", "app.js"]
+ENTRYPOINT ["node", "dist/app.js"]
