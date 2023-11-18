@@ -51,3 +51,6 @@ if (graphiteHost) {
     }
   }, graphiteInterval * 1000);
 }
+
+process.on('SIGINT', process.exit);
+process.on('SIGTERM', process.exit);
